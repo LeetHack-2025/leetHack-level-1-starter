@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>LeetHack - Level 1</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>LeetHack: Escape the Pixel Temple</h1>
+    <div id="modeToggle">
+      <button onclick="toggleMode('soft')">Soft Mode</button>
+      <button onclick="toggleMode('dyslexia')">Dyslexia Mode</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="role full-width">
+      <h2>Software Engineer</h2>
+
+      <div class="challenge-text">
+        <p>💾 Challenge: Solve this coding puzzle!</p>
+      </div>
+
+
+      <!-- Difficulty Buttons -->
+      <div class="difficulty-buttons"></div>
+
+      <!-- Code Editor -->
+      <div id="editor-se" class="editor"></div>
+
+      <!-- Buttons Row -->
+      <div class="buttons-row">
+        <button class="submit-button" onclick="submitCode()">Submit</button>
+        <div id="hearts">
+          <img src="heart.png" class="heart" id="heart1">
+          <img src="heart.png" class="heart" id="heart2">
+          <img src="heart.png" class="heart" id="heart3">
+        </div>
+      </div>
+      <!-- Score Display -->
+      <div id="score">Score: 0</div>
+  </main>
+
+  <!-- Hint Popup Modal -->
+  <div id="hintPopup" class="hint-popup hidden">
+    <div class="hint-box">
+      <p id="hintText"></p>
+      <button onclick="closeHint()">Close</button>
+    </div>
+  </div>
+
+  <!-- Import your dynamic JS (use module!) -->
+  <script type="module" src="script.js"></script>
+
+</body>
+
+</html>
