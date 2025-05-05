@@ -1,195 +1,96 @@
-// Import challenges
-import { softwareEngineerChallenges } from './challenges/software-engineer.js';
-
-// Global state
 let editor;
-let currentDifficulty = 'beginner';
-let capturedLogs = [];
-let score = 0;
 
-// Master heart states
-let allHearts = {
-  beginner: [false, false, false],
-  intermediate: [false, false, false],
-  advanced: [false, false, false]
+const challenges = {
+  beginner: {
+    prompt: "Challenge Beginner: Write a function `unlockTemple()` that logs 'Access granted!'.",
+    code: "function unlockTemple() {\n  // your code here\n}"
+  },
+  intermediate: {
+    prompt: "Challenge Intermediate: Write a function `doubleNumber(n)` that returns n*2.",
+    code: "function doubleNumber(n) {\n  // your code here\n}"
+  },
+  advanced: {
+    prompt: "Challenge Advanced: Write a function `isPrime(n)` that checks if n is prime.",
+    code: "function isPrime(n) {\n  // your code here\n}"
+  }
 };
 
-// Setup editor
-function setupEditor() {
-  editor = ace.edit("editor-se");
+window.onload = function () {
+  editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/javascript");
+};
 
-  renderDifficultyButtons();
+function loadChallenge(level) {
+  document.getElementById("challenge-text").textContent = challenges[level].prompt;
+  editor.setValue(challenges[level].code, -1);
+  document.getElementById("feedback").classList.add("hidden");
 }
 
-// Render difficulty buttons dynamically
-function renderDifficultyButtons() {
-  const difficulties = Object.keys(softwareEngineerChallenges);
-
-  const container = document.querySelector('.difficulty-buttons');
-  container.innerHTML = '';
-
-  difficulties.forEach((difficulty, index) => {
-    const btn = document.createElement('button');
-    btn.id = `btn-${difficulty}`;
-    btn.className = 'difficulty';
-    btn.innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-    btn.onclick = () => setDifficulty(difficulty);
-
-    if (index === 0) btn.classList.add('active'); // First button active
-    container.appendChild(btn);
-  });
-
-  setDifficulty('beginner');
+function submitCode() {
+  document.getElementById("feedback").classList.remove("hidden");
 }
 
-// Load challenge
-function loadChallenge() {
-  const challenge = softwareEngineerChallenges[currentDifficulty];
-
-  document.querySelector('.challenge-text p').innerText = challenge.description;
-  editor.setValue(challenge.starterCode, -1);
-}
-
-// Set difficulty
-function setDifficulty(level) {
-  currentDifficulty = level;
-
-  document.querySelectorAll('.difficulty').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.getElementById(`btn-${level}`).classList.add('active');
-
-  loadChallenge();
-  refreshHearts();
-}
-
-// Setup heart listeners
-function setupHeartListeners() {
-  for (let i = 1; i <= 3; i++) {
-    const heart = document.getElementById(`heart${i}`);
-    heart.addEventListener('click', () => useHint(i));
+window.toggleMode = function (mode) {
+  const body = document.body;
+  if (mode === 'soft') {
+    body.classList.toggle('soft-mode');
+    body.classList.remove('dyslexia-mode');
+  } else if (mode === 'dyslexia') {
+    body.classList.toggle('dyslexia-mode');
+    body.classList.remove('soft-mode');
   }
-  // Hint Close Button
-  const closeHintButton = document.querySelector('#hintPopup button');
-  closeHintButton.addEventListener('click', closeHint);
+};
+const allHints = {
+  beginner: [
+    "Use console.log(\"Access granted!\");",
+    "Make sure your function is called unlockTemple",
+    "Function syntax: function name() { }"
+  ],
+  intermediate: [
+    "Try using a loop or if-statement.",
+    "Watch for off-by-one errors.",
+    "Check your return type matches expectations."
+  ],
+  advanced: [
+    "Prime numbers are divisible only by 1 and themselves.",
+    "Use a loop from 2 to Math.sqrt(n).",
+    "Use return true/false based on condition."
+  ]
+};
+
+let usedHints = [false, false, false];
+let currentScore = 0;
+
+function useHint(index) {
+  if (usedHints[index]) return;
+  usedHints[index] = true;
+
+  const hearts = document.querySelectorAll('.heart');
+  hearts[index].classList.add('used');
+
+  const hint = allHints[currentDifficulty]?.[index] || "No hint available.";
+  document.getElementById('hintText').innerText = hint;
+  document.getElementById('hintPopup').classList.remove('hidden');
 }
 
-// Refresh hearts visually
-function refreshHearts() {
-  const heartsState = allHearts[currentDifficulty];
 
-  for (let i = 0; i < 3; i++) {
-    const heartImg = document.getElementById(`heart${i + 1}`);
-    if (heartsState[i]) {
-      heartImg.src = 'heart_dead.png';
-    } else {
-      heartImg.src = 'heart.png';
-    }
-  }
-}
-
-// Use a hint
-function useHint(heartNumber) {
-  const heartsState = allHearts[currentDifficulty];
-
-  if (!heartsState[heartNumber - 1]) {
-    heartsState[heartNumber - 1] = true;
-
-    const heartImg = document.getElementById(`heart${heartNumber}`);
-    heartImg.src = 'heart_dead.png';
-
-    // Show hint popup
-    const hint = softwareEngineerChallenges[currentDifficulty].hint;
-    document.getElementById('hintText').innerText = hint;
-    document.getElementById('hintPopup').classList.remove('hidden');
-  }
-}
-
-// Close hint
 function closeHint() {
   document.getElementById('hintPopup').classList.add('hidden');
 }
 
-// Safe evaluation
-function safeEval(code) {
-  capturedLogs = [];
-
-  const sandbox = {
-    console: {
-      log: (...args) => capturedLogs.push(args.join(' '))
-    }
-  };
-
-  const sandboxKeys = Object.keys(sandbox);
-  const sandboxValues = Object.values(sandbox);
-
-  const consoleBackup = console.log;
-
-  try {
-    const runner = new Function(...sandboxKeys, code);
-    runner(...sandboxValues);
-  } finally {
-    console.log = consoleBackup;
-  }
-}
-
-// Submit code
 function submitCode() {
-  const challenge = softwareEngineerChallenges[currentDifficulty];
-  const userCode = editor.getValue();
+  const userCode = editor.getValue().trim();
+  const correct = userCode.includes("function unlockTemple()") && userCode.includes("console.log(\"Access granted!\")");
 
-  try {
-    safeEval(userCode);
+  let base = 0;
+  if (currentDifficulty === "beginner") base = 5;
+  else if (currentDifficulty === "intermediate") base = 2;
+  else if (currentDifficulty === "advanced") base = 3;
 
-    if (capturedLogs.includes(challenge.expectedOutput)) {
-      const penalty = calculateHintPenalty();
-      alert(`✅ Challenge Complete! (Penalty: ${penalty})`);
-      updateScore(5 + penalty);
-    } else {
-      alert("❌ Try Again!");
-    }
-  } catch (error) {
-    console.error(error);
-    alert("❗ Error in your code.");
-  }
+  const bonus = usedHints.filter(h => !h).length;
+  currentScore += base + bonus;
+
+  document.getElementById('score').innerText = `Score: ${currentScore}`;
+  alert(correct ? "✅ Correct!" : "❌ Try Again!");
 }
-
-// Update score
-function updateScore(points) {
-  score += points;
-  document.getElementById('score').innerText = `Score: ${score}`;
-}
-
-// Calculate penalty
-function calculateHintPenalty() {
-  const heartsState = allHearts[currentDifficulty];
-  return heartsState.filter(state => state).length * -1;
-}
-
-
-// Toggle Accessibility Modes
-function toggleMode(mode) {
-  if (mode === 'soft') {
-    document.body.classList.toggle('soft-mode');
-    const softButton = document.querySelector("#modeToggle button:nth-child(1)");
-    softButton.classList.toggle('toggled');
-  } else if (mode === 'dyslexia') {
-    document.body.classList.toggle('dyslexia-mode');
-    const dyslexiaButton = document.querySelector("#modeToggle button:nth-child(2)");
-    dyslexiaButton.classList.toggle('toggled');
-  }
-}
-
-
-
-// Initialize
-window.addEventListener('DOMContentLoaded', () => {
-  setupEditor();
-  setupHeartListeners();
-});
-// Make available globally to HTML onclicks
-window.toggleMode = toggleMode;
-
-
