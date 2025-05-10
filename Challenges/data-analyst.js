@@ -5,4 +5,3 @@ export const dataAnalystStarter = {
 
   advanced: `# Advanced Task\n# Manually group users by green travel frequency\n# Frequent: 5+ trips, Occasional: 2–4 trips, Rare: <2 trips\n\nusers = {\n    "Aisha": 6,\n    "Ben": 3,\n    "Chi": 1\n}\n\n# Output suggestions based on category`
 };
-
