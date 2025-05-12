@@ -1,14 +1,15 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>LeetHack - Green Transit</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>LeetHack - Level 1</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
 </head>
 <body>
   <header>
-    <h1>LeetHack: Level 2 – Green Transit</h1>
+    <h1>LeetHack: Escape the Pixel Temple</h1>
     <div id="modeToggle">
       <button onclick="toggleMode('soft')">Soft Mode</button>
       <button onclick="toggleMode('dyslexia')">Dyslexia Mode</button>
@@ -16,45 +17,41 @@
   </header>
 
   <main>
-    <!-- Home Screen -->
-    <div id="homeScreen">
-      <p>
-        Welcome to <strong>Level 2 – Green Transit</strong>.<br>
-        Your team must complete four interdependent coding tasks to help build a sustainable transport app.<br><br>
-        You’ll take on one role at a time. Complete each role’s challenge to move forward.
-      </p>
-      <button class="submit-button" onclick="startLevel()">Begin Challenge</button>
-    </div>
+    <div class="role">
+      <h2>Software Engineer</h2>
+      <div class="challenge-text" id="challenge-text">Choose a difficulty</div>
 
-    <!-- Challenge Interface -->
-    <div id="challengeArea" class="hidden">
-      <h2 id="roleDisplay"></h2>
-      <div class="challenge-text" id="challenge-text">Task will appear here.</div>
+      <div class="difficulty-buttons">
+        <button onclick="loadChallenge('beginner')">Beginner</button>
+        <button onclick="loadChallenge('intermediate')">Intermediate</button>
+        <button onclick="loadChallenge('advanced')">Advanced</button>
+      </div>
 
       <div id="editor" class="editor"></div>
 
-      <button class="submit-button" onclick="submitCode()">Submit</button>
-      <div id="feedback" class="feedback hidden">✅ Task Complete!</div>
-
       <div class="submit-row">
+        <button class="submit-button" onclick="submitCode()">Test</button>
         <div id="hearts">
-          <img src="heart.png" class="heart" onclick="useHint(0)">
-          <img src="heart.png" class="heart" onclick="useHint(1)">
-          <img src="heart.png" class="heart" onclick="useHint(2)">
+          <img src="heart.png" class="heart" onclick="showHint(0)">
+          <img src="heart.png" class="heart" onclick="showHint(1)">
+          <img src="heart.png" class="heart" onclick="showHint(2)">
         </div>
       </div>
 
-      <div class="hint-popup hidden" id="hintPopup">
-        <div class="hint-box">
-          <p id="hintText">Hint goes here.</p>
-          <button onclick="closeHint()">Close</button>
-        </div>
-      </div>
-
-      <p id="score">Score: 0</p>
+      <div id="output" class="output hidden"></div>
+      <div id="score">Score: 0</div>
     </div>
   </main>
 
-  <script type="module" src="script.js"></script>
+  <button class="submit-button" onclick="submitCode()">Submit</button>
+
+  <div id="hintPopup" class="hint-popup hidden">
+    <div class="hint-box">
+      <p id="hintText">Hint goes here...</p>
+      <button onclick="closeHint()">Close Hint</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

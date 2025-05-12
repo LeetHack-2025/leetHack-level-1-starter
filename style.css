@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* Universal Styling */
 body, h1, h2, h3, button, p, span, div {
   font-family: 'Press Start 2P', monospace;
   margin: 0;
@@ -12,124 +11,122 @@ body {
   color: #fffbd6;
   text-align: center;
   padding: 2em;
-  font-size: 16px;
-  line-height: 1.6;
 }
 
 h1 {
-  font-size: 1.4em;
-  color: #e6c200;
+  font-size: 1.2em;
+  color: gold;
   text-shadow: 2px 2px 0 #000, 4px 4px 0 #000;
-  margin-bottom: 1.5em;
 }
 
 h2 {
-  font-size: 1.1em;
-  margin: 1.5em 0 1em;
+  font-size: 1em;
+  margin-bottom: 1em;
   text-shadow: 2px 2px 0 #000;
 }
 
-/* Accessible Mode Toggle Buttons */
 #modeToggle button {
-  font-size: 16px;
-  padding: 10px 20px;
+  font-size: 12px;
+  padding: 10px;
   margin: 0.5em;
-  background-color: #e6c200;
+  background-color: gold;
   border: none;
   cursor: pointer;
   text-shadow: 1px 1px 0 #000;
+  transition: transform 0.2s ease;
 }
 
-#modeToggle button:hover,
-button:focus {
+#modeToggle button:hover {
   background-color: #ffd700;
-  outline: 3px solid #fffbd6;
-  outline-offset: 2px;
+  transform: scale(1.1);
 }
 
-#homeScreen {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2em;
-  line-height: 1.6;
-}
-
-#homeScreen p {
-  margin-bottom: 2em;
-}
-
-/* Role Challenge Display */
 .role {
   background-color: #001a33;
   border: 2px solid gold;
-  border-radius: 12px;
-  padding: 2em;
+  border-radius: 10px;
+  padding: 1.5em;
   margin-top: 2em;
 }
 
 .challenge-text {
+  height: 100px;
+  max-width: 800px;
+  margin: 0 auto 1em auto;
+  padding: 1em;
   background-color: #001a33;
   border: 2px solid gold;
-  padding: 1em;
-  margin: 1em auto;
-  font-size: 14px;
   color: #fffbd6;
-  line-height: 1.6;
-  max-width: 800px;
-  text-align: left;
   overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: 'Press Start 2P', monospace;
 }
 
-/* Code Editor */
+.difficulty-buttons button {
+  margin: 0 0.3em;
+  padding: 6px 12px;
+  background-color: gold;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.difficulty-buttons button:hover {
+  transform: scale(1.1);
+}
+
 .editor {
-  height: 220px;
+  height: 200px;
   margin-top: 1em;
   border: 2px solid gold;
 }
 
-/* Buttons and Interactions */
-.submit-button,
-.difficulty-buttons button,
-.hint-box button {
+.submit-button {
   margin-top: 1em;
   padding: 10px 20px;
   background-color: gold;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   transition: transform 0.2s ease;
 }
 
-button:hover, .heart:hover {
-  transform: scale(1.15);
-}
-
-.difficulty-buttons button {
-  margin: 0.5em;
-}
-
-/* Score and Feedback */
-#score {
-  font-size: 1.2em;
-  font-style: italic;
-  color: #fffbd6;
-  margin-top: 1em;
+.submit-button:hover {
+  transform: scale(1.1);
 }
 
 .feedback {
   margin-top: 1em;
   color: lime;
-  font-size: 14px;
+  font-size: 12px;
   animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Hint System */
+.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .submit-row {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1em;
   margin-top: 1.5em;
+}
+
+button, .heart {
+  transition: transform 0.2s ease;
+}
+
+button:hover, .heart:hover {
+  transform: scale(1.15);
 }
 
 #hearts img {
@@ -140,6 +137,13 @@ button:hover, .heart:hover {
 .heart.used {
   filter: grayscale(100%);
   opacity: 0.5;
+}
+
+#score {
+  font-size: 1.2em;
+  font-style: italic;
+  color: #fffbd6;
+  margin-top: 1em;
 }
 
 .hint-popup {
@@ -167,36 +171,40 @@ button:hover, .heart:hover {
 
 .hint-box button {
   margin-top: 1em;
-  padding: 0.75em 1.5em;
+  padding: 0.5em 1em;
   background: gold;
   color: black;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  transition: transform 0.2s ease;
 }
 
-/* Modes */
+.hint-box button:hover {
+  transform: scale(1.1);
+}
+
+/* Soft Mode */
 body.soft-mode {
-  background-color: #f2f2f2;
-  color: #333;
+  background-color: #eeeeee;
+  color: #000;
 }
 
+.soft-mode .role,
+.soft-mode .challenge-text {
+  background-color: #f7f7f7;
+  color: #111;
+  border-color: #444;
+}
+
+.soft-mode #score {
+  color: #000;
+}
+
+/* Dyslexia Mode */
 body.dyslexia-mode {
   font-family: 'OpenDyslexic', Arial, sans-serif;
-  letter-spacing: 1px;
-  word-spacing: 2px;
-  line-height: 2;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Accessibility: Focus outlines */
-button:focus,
-.heart:focus {
-  outline: 3px solid #e6c200;
-  outline-offset: 2px;
+  font-size: 1.05em;
+  letter-spacing: 0.07em;
+  word-spacing: 0.12em;
+  line-height: 1.7;
 }

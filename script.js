@@ -1,149 +1,115 @@
-import { softwareEngineerStarter } from "./Challenges/software-engineer.js";
-import { cybersecuritySpecialistStarter } from "./Challenges/cybersecurity-specialist.js";
-import { dataAnalystStarter } from "./Challenges/data-analyst.js";
-import { uxDesignerStarter } from "./Challenges/ux-designer.js";
-
-const starterMap = {
-  "software-engineer": softwareEngineerStarter,
-  "cybersecurity-specialist": cybersecuritySpecialistStarter,
-  "data-analyst": dataAnalystStarter,
-  "ux-designer": uxDesignerStarter
-};
-
-const hintMap = {
-  "software-engineer": [
-    "Use km * 120 to calculate CO₂ saved.",
-    "Functions should start with def and take parameters.",
-    "Think about simple arithmetic and returning a value."
+let editor;
+let currentDifficulty = null;
+let score = 0;
+const hintsUsed = [false, false, false];
+const challengeHints = {
+  beginner: [
+    "Use `console.log('Access granted!')` inside your function.",
+    "The function should be named `unlockTemple` and take no parameters.",
+    "Double check your curly brackets."
   ],
-  "cybersecurity-specialist": [
-    "Use string methods to check password contents.",
-    "Hashing means converting text into a fixed-length code.",
-    "Use SHA-256 for secure storage."
+  intermediate: [
+    "Check if the input is even or divisible by 2.",
+    "Loop through possible divisors.",
+    "Return false if you find any divisors, true otherwise."
   ],
-  "data-analyst": [
-    "Loop through the data and add up the numbers.",
-    "Use matplotlib to plot results.",
-    "Use conditional logic to group users by activity."
-  ],
-  "ux-designer": [
-    "WCAG compliance includes good contrast and labels.",
-    "Use semantic HTML like <label> and <section>.",
-    "Use CSS flex or grid for responsive layouts."
+  advanced: [
+    "Use a loop to check divisibility from 2 to sqrt(n).",
+    "Use `n % i === 0` to check if divisible.",
+    "Don’t forget to return true at the end if no divisors are found."
   ]
 };
 
-const turnOrder = [
-  "software-engineer",
-  "cybersecurity-specialist",
-  "data-analyst",
-  "ux-designer"
-];
+const challenges = {
+  beginner: {
+    text: "Challenge Beginner: Write a function `unlockTemple()` that logs 'Access granted!'.",
+    code: "function unlockTemple() {\n  // your code here\n}"
+  },
+  intermediate: {
+    text: "Challenge Intermediate: Write a function `isEven(n)` that returns true if n is even.",
+    code: "function isEven(n) {\n  // your code here\n}"
+  },
+  advanced: {
+    text: "Challenge Advanced: Write a function `isPrime(n)` that checks if n is prime.",
+    code: "function isPrime(n) {\n  // your code here\n}"
+  }
+};
 
-let currentRoleIndex = parseInt(localStorage.getItem("currentRoleIndex") || "0");
-let usedHints = JSON.parse(localStorage.getItem("usedHints") || "[false,false,false]");
-let currentScore = parseInt(localStorage.getItem("score") || "0");
-let currentDifficulty = "beginner";
-let editor;
+function loadChallenge(level) {
+  currentDifficulty = level;
+  document.getElementById("challenge-text").innerText = challenges[level].text;
+  editor.setValue(challenges[level].code, -1);
+}
+
+function showHint(index) {
+  if (!currentDifficulty) return;
+
+  const heart = document.getElementsByClassName("heart")[index];
+  const hintText = challengeHints[currentDifficulty][index];
+
+  document.getElementById("hintText").innerText = hintText;
+  document.getElementById("hintPopup").classList.remove("hidden");
+
+  if (!hintsUsed[index]) {
+    heart.classList.add("used");
+    hintsUsed[index] = true;
+  }
+}
+
+function closeHint() {
+  document.getElementById("hintPopup").classList.add("hidden");
+}
+
+function toggleMode(mode) {
+  const body = document.body;
+  if (mode === 'soft') {
+    body.classList.toggle("soft-mode");
+  } else if (mode === 'dyslexia') {
+    body.classList.toggle("dyslexia-mode");
+  }
+}
+
+function submitCode() {
+  const userCode = editor.getValue();
+  console.log("Submitting:\n", userCode);
+
+  // Placeholder: In future scoring will be updated based on correctness
+  alert("Code submitted. Future versions will score and validate!");
+}
+
+function runCode() {
+  const userCode = editor.getValue();
+  const output = document.createElement("div");
+  output.innerHTML = "<strong>Output:</strong><br><pre>" + escapeHTML(runSandboxed(userCode)) + "</pre>";
+  document.body.appendChild(output);
+}
+
+function runSandboxed(code) {
+  try {
+    const oldLog = console.log;
+    let output = "";
+    console.log = (...args) => { output += args.join(" ") + "\n"; };
+    new Function(code)();
+    console.log = oldLog;
+    return output || "(No output)";
+  } catch (err) {
+    return "Error: " + err.message;
+  }
+}
+
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, match => {
+    return {
+      '&': '&amp;', '<': '&lt;', '>': '&gt;',
+      '"': '&quot;', "'": '&#039;'
+    }[match];
+  });
+}
 
 window.onload = function () {
   editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
-  editor.session.setMode("ace/mode/python");
-  editor.setValue("# Click 'Begin Challenge' to start", -1);
-
-  document.getElementById("feedback").classList.add("hidden");
-  document.getElementById("hintPopup").classList.add("hidden");
-  updateHearts();
-};
-
-window.startLevel = function () {
-  document.getElementById("homeScreen").classList.add("hidden");
-  document.getElementById("challengeArea").classList.remove("hidden");
-  loadCurrentRoleChallenge();
-};
-
-function loadCurrentRoleChallenge() {
-  const role = turnOrder[currentRoleIndex];
-  const starter = starterMap[role];
-  const challenge = starter[currentDifficulty];
-
-  document.getElementById("roleDisplay").innerText = `Current Role: ${formatRole(role)}`;
-  document.getElementById("challenge-text").textContent = challenge.split("\n")[0];
-  editor.setValue(challenge, -1);
-  document.getElementById("feedback").classList.add("hidden");
-  document.getElementById("hintPopup").classList.add("hidden");
-  updateHearts();
-}
-
-window.submitCode = function () {
-  const role = turnOrder[currentRoleIndex];
-
-  let base = 0;
-  if (currentDifficulty === "beginner") base = 5;
-  else if (currentDifficulty === "intermediate") base = 2;
-  else if (currentDifficulty === "advanced") base = 3;
-
-  const bonus = usedHints.filter(h => !h).length;
-  currentScore += base + bonus;
-
-  currentRoleIndex++;
-  localStorage.setItem("score", currentScore);
-  localStorage.setItem("currentRoleIndex", currentRoleIndex);
-  localStorage.setItem("usedHints", JSON.stringify(usedHints));
-
-  document.getElementById("score").innerText = `Score: ${currentScore}`;
-  document.getElementById("feedback").classList.remove("hidden");
-
-  if (currentRoleIndex < turnOrder.length) {
-    alert("✅ Task complete! Next role unlocked.");
-    usedHints = [false, false, false];
-    loadCurrentRoleChallenge();
-  } else {
-    alert("🎉 All roles complete! Level finished.");
-    document.getElementById("challenge-text").textContent = "Challenge complete!";
-    editor.setValue("# Well done!", -1);
-  }
-};
-
-window.useHint = function (index) {
-  if (usedHints[index]) return;
-  usedHints[index] = true;
-
-  document.querySelectorAll(".heart")[index].classList.add("used");
-
-  const role = turnOrder[currentRoleIndex];
-  const hint = hintMap[role]?.[index] || "No hint available.";
-  document.getElementById("hintText").innerText = hint;
-  document.getElementById("hintPopup").classList.remove("hidden");
-
-  localStorage.setItem("usedHints", JSON.stringify(usedHints));
-};
-
-window.closeHint = function () {
-  document.getElementById("hintPopup").classList.add("hidden");
-};
-
-function updateHearts() {
-  document.querySelectorAll(".heart").forEach((img, i) => {
-    img.classList.toggle("used", usedHints[i]);
-  });
-}
-
-function formatRole(role) {
-  return role
-    .split("-")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-window.toggleMode = function (mode) {
-  const body = document.body;
-  if (mode === "soft") {
-    body.classList.toggle("soft-mode");
-    body.classList.remove("dyslexia-mode");
-  } else if (mode === "dyslexia") {
-    body.classList.toggle("dyslexia-mode");
-    body.classList.remove("soft-mode");
-  }
+  editor.session.setMode("ace/mode/javascript");
+  editor.setFontSize(14);
+  editor.setShowPrintMargin(false);
 };
